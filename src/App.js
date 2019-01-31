@@ -9,15 +9,15 @@ class App extends Component {
     posts: []
   };
 
-  // get request to end point
-  async componentDidMount() {
+    // get request to end point
+    async componentDidMount() {
         // get data from endpoint
         const { data: posts} = await axios.get(apiEndpoint);
         // fills tables with data
         this.setState({posts});
-  }
+    }
 
-  handleAdd = async () => {
+    handleAdd = async () => {
       const obj = { title: 'a', body: 'b' };
       const { data: post } = await axios.post(apiEndpoint, obj);
 
@@ -25,9 +25,9 @@ class App extends Component {
         const posts = [post, ...this.state.posts];
         // update posts table with new data
         this.setState({posts});
-  };
+    };
 
-  handleUpdate = async post => {
+    handleUpdate = async post => {
         post.title = 'UPDATE';
         await axios.put(apiEndpoint + '/' + post.id, post);
 
@@ -35,16 +35,39 @@ class App extends Component {
         const index = posts.indexOf(post);
         posts[index] = { ...post };
         this.setState({ posts });
-  };
+    };
 
-  handleDelete = async post => {
-      await axios.delete(apiEndpoint + '/' + post.id);
+    // Deleting a post
+    handleDelete = async post => {
+        // set it to original state in case of error
+        const originalPost = this.state.posts;
 
-      const posts = this.state.posts.filter(p => p.id !== post.id);
-      this.setState({ posts });
-  };
+        // set it to new state in case of success
+        const posts = this.state.posts.filter(p => p.id !== post.id);
+        this.setState({ posts });
 
-  render() {
+        try {
+            // update endpoint
+            await axios.delete(apiEndpoint + '/' + post.id);
+            // trow error test
+            // throw new Error('');
+        } catch (error) {
+            // Expected error
+            if(error.response && error)
+            // Expected error (e.g. 404 NOT FOUND...)
+            if(error.response && error.response.status === 404)
+                alert('Post already been deleted');
+            // unexpected error (e.g server error, bug...)
+            else {
+                console.log('Loging error', error);
+                alert('Unexpected error while deleting!');
+            }
+            // set UI to original state in case of error
+            this.setState({ posts: originalPost });
+        }
+    };
+
+    render() {
     return (
       <React.Fragment>
         <button className="btn btn-primary" onClick={this.handleAdd}>
