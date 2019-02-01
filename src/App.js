@@ -1,19 +1,9 @@
 import React, { Component } from "react";
-import axios from 'axios';
+import httpService from './services/httpService';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import config from './config.json';
 import "./App.css";
-
-// handle error globaly
-axios.interceptors.response.use(null, error => {
-    const expectedError = error.response && error.response.status >= 400 && error.response.status <= 500;
-
-    if(!expectedError) {
-        console.log('Loging error', error);
-        alert('Unexpected error!');
-    }
-    return Promise.reject(error);
-})
-
-const apiEndpoint = 'https://jsonplaceholder.typicode.com/posts';
 
 class App extends Component {
   state = {
@@ -23,14 +13,14 @@ class App extends Component {
     // get request to end point
     async componentDidMount() {
         // get data from endpoint
-        const { data: posts} = await axios.get(apiEndpoint);
+        const { data: posts} = await httpService.get(config.apiEndpoint);
         // fills tables with data
         this.setState({posts});
     }
 
     handleAdd = async () => {
       const obj = { title: 'a', body: 'b' };
-      const { data: post } = await axios.post(apiEndpoint, obj);
+      const { data: post } = await httpService.post(config.apiEndpoint, obj);
 
         // create new post table with added post
         const posts = [post, ...this.state.posts];
@@ -40,7 +30,7 @@ class App extends Component {
 
     handleUpdate = async post => {
         post.title = 'UPDATE';
-        await axios.put(apiEndpoint + '/' + post.id, post);
+        await httpService.put(config.apiEndpoint + '/' + post.id, post);
 
         const posts = [...this.state.posts];
         const index = posts.indexOf(post);
@@ -59,7 +49,7 @@ class App extends Component {
 
         try {
             // update endpoint
-            await axios.delete(apiEndpoint + '/' + post.id);
+            await httpService.delete(config.apiEndpoint + '/' + post.id);
             // trow error test
             // throw new Error('');
         } catch (error) {
@@ -68,7 +58,7 @@ class App extends Component {
             // Expected error (e.g. 404 NOT FOUND...)
             if(error.response && error.response.status === 404)
                 alert('Post already been deleted');
-            // unexpected error (e.g server error, bug...) axios.interceptors line 5
+            // unexpected error (e.g server error, bug...) axios.interceptors from httpService
 
             // set UI to original state in case of error
             this.setState({ posts: originalPost });
@@ -78,6 +68,7 @@ class App extends Component {
     render() {
     return (
       <React.Fragment>
+        <ToastContainer/>
         <button className="btn btn-primary" onClick={this.handleAdd}>
           Add
         </button>
