@@ -2,6 +2,17 @@ import React, { Component } from "react";
 import axios from 'axios';
 import "./App.css";
 
+// handle error globaly
+axios.interceptors.response.use(null, error => {
+    const expectedError = error.response && error.response.status >= 400 && error.response.status <= 500;
+
+    if(!expectedError) {
+        console.log('Loging error', error);
+        alert('Unexpected error!');
+    }
+    return Promise.reject(error);
+})
+
 const apiEndpoint = 'https://jsonplaceholder.typicode.com/posts';
 
 class App extends Component {
@@ -57,11 +68,8 @@ class App extends Component {
             // Expected error (e.g. 404 NOT FOUND...)
             if(error.response && error.response.status === 404)
                 alert('Post already been deleted');
-            // unexpected error (e.g server error, bug...)
-            else {
-                console.log('Loging error', error);
-                alert('Unexpected error while deleting!');
-            }
+            // unexpected error (e.g server error, bug...) axios.interceptors line 5
+
             // set UI to original state in case of error
             this.setState({ posts: originalPost });
         }
