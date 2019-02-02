@@ -1,4 +1,4 @@
-   "features": [
+const features =  [
   { 'lat': -0.278126, 'long':51.5025, "name":"Acton Town" },
   { 'lat': -0.263033174, 'long':51.50883531, "name":"Acton Central" },
   { 'lat': -0.262879534, 'long':51.50856013, "name":"Acton Central" },
@@ -300,5 +300,7 @@
   { 'lat': -0.19864, 'long':51.43391, "name":"Wimbledon Park" },
   { 'lat': -0.10939, 'long':51.59709, "name":"Wood Green" },
   { 'lat': 0.03328, 'long':51.60582, "name":"Woodford" },
-  { 'lat': -0.185578888, 'long':51.61817173, "name":"Woodside Park  }
-]
+  { 'lat': -0.185578888, 'long':51.61817173, "name":"Woodside Park"}
+];
+const array = features.map((e) => [e.lat, e.long, e.name]);
+console.log(array);
